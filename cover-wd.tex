@@ -1,0 +1,25 @@
+%!TEX root = string-cleanup.tex
+%%--------------------------------------------------
+%% Title page for this document
+
+
+\thispagestyle{empty}
+\begingroup
+\def\hd{\begin{tabular}{lll}
+          \textbf{Document Number:} & {\larger\docno}             \\
+          \textbf{Date:}            & \reldate                    \\
+          \textbf{Audience:}        & Library Working Group       \\
+          \textbf{Reply to:}        & Tim Song                    \\
+                                    & rs2740@gmail.com
+          \end{tabular}
+}
+\newlength{\hdwidth}
+\settowidth{\hdwidth}{\hd}
+\hfill\begin{minipage}{\hdwidth}\hd\end{minipage}
+\endgroup
+
+\vspace{2.5cm}
+\begin{center}
+\textbf{\Huge \doctitle}
+\end{center}
+\newpage

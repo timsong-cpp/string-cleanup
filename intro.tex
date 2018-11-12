@@ -1,0 +1,60 @@
+%!TEX root = string-cleanup.tex
+\rSec0[intro]{Introduction}
+
+\rSec1[intro.summary]{Summary}
+
+\pnum
+This paper proposes a comprehensive cleanup of the specification of 
+\tcode{char_traits}, \tcode{basic_string} and \tcode{basic_string_view}.
+Among other things, it resolves the following LWG issues:
+\begin{itemize}
+\item \lwg{2151}: by adding a \expects to \ref{string.swap};
+\item \lwg{2318}: by rewriting the affected wording;
+\item \lwg{2836}: by respecifying to rely on \tcode{basic_string_view} throughout (``\throws Nothing.'' was not added;
+it can be added to \tcode{basic_string_view}'s constructors in \ref{string.view.cons} if desired);
+\item \lwg{2841}: by updating the wording to use ``equivalent to'' whenever possible;
+\item \lwg{2929}: by avoiding default-constructing allocators for temporaries used in these and other functions;
+\item \lwg{2994} (partially): by making \tcode{traits::char_type}/\tcode{charT} mismatch ill-formed;
+\item \lwg{3111}: by using the ``\range{s}{s + n} is a valid range'' formulation throughout.
+\end{itemize}
+
+\pnum
+Some drive-by fixes are proposed for the introductory portions of \ref{input.output},
+primarily to define two \grammarterm{typedef-name}s 
+(\tcode{u16streampos} and \tcode{u32streampos})
+used in \tcode{char_traits} specializations but not defined anywhere. 
+While the specification of iostreams could likely use some improvement,
+doing so is beyond the scope of this paper.
+
+\rSec1[intro.history]{Revision History}
+\rSec2[intro.history.r0]{Revision 0}
+Initial version.
+
+\rSec1[intro.style]{Style of presentation}
+
+\pnum
+The remainder of this document is a technical specification in the form of
+editorial instructions directing that changes be made to the text of the C++
+working draft N4762. The formatting of the text suggests the origin of each 
+portion of the wording.
+
+Existing wording from the C++ working draft - included to provide context - is
+presented without decoration.
+
+\begin{addedblock}
+Entire blocks of wording to be added are presented in a distinct cyan color.
+\end{addedblock}
+
+\added{In-line additions of wording to the C++ working draft are presented in 
+cyan with underline.}
+
+\removed{In-line bits of wording to be removed from the C++ working
+draft are presented in red with strike-through.}
+
+\begin{removedblock}
+Entire blocks of wording to be removed form the C++ working draft are presented 
+in red.
+\end{removedblock}
+
+\textcolor{noteclr}{Drafting notes are presented in blue, like }\draftnote{this}.
+

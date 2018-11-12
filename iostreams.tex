@@ -1,0 +1,405 @@
+%!TEX root = string-cleanup.tex
+\setcounter{chapter}{26}
+\rSec0[input.output]{Input/output library}
+\setcounter{table}{103}
+\setcounter{figure}{6}
+\setcounter{footnote}{288}
+\setcounter{page}{1149}
+\rSec1[input.output.general]{General}
+
+\pnum
+This Clause describes components that \Cpp{} programs may use to perform
+input/output operations.
+
+\pnum
+The following subclauses describe
+requirements for stream parameters,
+and components for
+forward declarations of iostreams,
+predefined iostreams objects,
+base iostreams classes,
+stream buffering,
+stream formatting and manipulators,
+string streams,
+and file streams,
+as summarized in \tref{iostreams.lib.summary}.
+
+\begin{libsumtab}{Input/output library summary}{tab:iostreams.lib.summary}
+\ref{iostreams.requirements}  & Requirements                &                      \\ \rowsep
+\ref{iostream.forward}        & Forward declarations        & \tcode{<iosfwd>}     \\ \rowsep
+\cxxref{iostream.objects}     & Standard iostream objects   & \tcode{<iostream>}   \\ \rowsep
+\cxxref{iostreams.base}       & Iostreams base classes      & \tcode{<ios>}        \\ \rowsep
+\cxxref{stream.buffers}       & Stream buffers              & \tcode{<streambuf>}  \\ \rowsep
+\cxxref{iostream.format}      & Formatting and manipulators & \tcode{<istream>}    \\
+                              &                             & \tcode{<ostream>}    \\
+                              &                             & \tcode{<iomanip>}    \\ \rowsep
+\cxxref{string.streams}       & String streams              & \tcode{<sstream>}    \\ \rowsep
+\cxxref{file.streams}         & File streams                & \tcode{<fstream>}    \\ \rowsep
+\cxxref{syncstream}           & Synchronized output streams & \tcode{<syncstream>} \\ \rowsep
+\cxxref{filesystems}          & File systems                & \tcode{<filesystem>} \\ \rowsep
+\cxxref{c.files}              & C library files             & \tcode{<cstdio>}     \\
+                              &                             & \tcode{<cinttypes>}  \\
+\end{libsumtab}
+
+\pnum
+Figure~\ref{fig:streampos} illustrates relationships among various types
+described in this clause. A line from \textbf{A} to \textbf{B} indicates that \textbf{A}
+is an alias (e.g., a typedef) for \textbf{B} or that \textbf{A} is defined in terms of
+\textbf{B}.
+
+\begin{importgraphic}
+{Stream position, offset, and size types [non-normative]}
+{fig:streampos}
+{figstreampos.pdf}
+\end{importgraphic}
+
+\rSec1[iostreams.requirements]{Iostreams requirements}
+
+\rSec2[iostream.limits.imbue]{Imbue limitations}
+
+\pnum
+No function described in \ref{input.output} except for
+\tcode{ios_base::imbue}
+and \tcode{basic_filebuf::pubimbue}
+causes any instance of
+\tcode{basic_ios::imbue}
+or
+\tcode{basic_streambuf::imbue}
+to be called.
+If any user function called from a function declared in \ref{input.output} or
+as an overriding virtual function of any class declared in \ref{input.output}
+calls
+\tcode{imbue},
+the behavior is undefined.
+
+\rSec2[iostreams.limits.pos]{Positioning type limitations}
+
+\pnum
+The classes of \ref{input.output} with template arguments
+\tcode{charT}
+and
+\tcode{traits}
+behave as described if
+\tcode{traits::pos_type}
+and
+\tcode{traits::off_type}
+are
+\tcode{streampos}
+and
+\tcode{streamoff}
+respectively.
+Except as noted explicitly below, their behavior when
+\tcode{traits::pos_type}
+and
+\tcode{traits::off_type}
+are other types is
+\impldef{behavior of iostream classes when \tcode{traits::pos_type} is not
+\tcode{streampos} or when \tcode{traits::\brk{}off_type} is not \tcode{streamoff}}.
+
+\pnum
+In the classes of \ref{input.output}, a template parameter with name
+\tcode{charT} represents a member of the set of types containing \tcode{char}, \tcode{wchar_t},
+and any other \impldef{set of character types that iostreams templates can be instantiated for}
+character types that satisfy the requirements for a character on which any of
+the iostream components can be instantiated.
+
+\rSec2[iostreams.threadsafety]{Thread safety}
+
+\pnum
+Concurrent access to a stream object~(\cxxref{string.streams}, \cxxref{file.streams}), stream buffer
+object\cxxiref{stream.buffers}, or C Library stream\cxxiref{c.files} by multiple threads may result in
+a data race\cxxiref{intro.multithread} unless otherwise specified\cxxiref{iostream.objects}.
+\begin{note} Data races result in undefined behavior\cxxiref{intro.multithread}. \end{note}
+
+\pnum
+If one thread makes a library call \textit{a} that writes a value to a stream
+and, as a result, another thread reads this value from the stream through a
+library call \textit{b} such that this does not result in a data race, then
+\textit{a}'s write synchronizes with
+\textit{b}'s read.
+
+\rSec1[iostream.forward]{Forward declarations}
+
+\rSec2[iosfwd.syn]{Header \tcode{<iosfwd>} synopsis}
+\indexhdr{iosfwd}%
+
+\indexlibrary{\idxcode{basic_ios}}%
+\indexlibrary{\idxcode{basic_streambuf}}%
+\indexlibrary{\idxcode{basic_istream}}%
+\indexlibrary{\idxcode{basic_ostream}}%
+\indexlibrary{\idxcode{basic_stringbuf}}%
+\indexlibrary{\idxcode{basic_istringstream}}%
+\indexlibrary{\idxcode{basic_ostringstream}}%
+\indexlibrary{\idxcode{basic_stringstream}}%
+\indexlibrary{\idxcode{basic_filebuf}}%
+\indexlibrary{\idxcode{basic_ifstream}}%
+\indexlibrary{\idxcode{basic_ofstream}}%
+\indexlibrary{\idxcode{basic_fstream}}%
+\indexlibrary{\idxcode{basic_istreambuf_iterator}}%
+\indexlibrary{\idxcode{basic_ostreambuf_iterator}}%
+\indexlibrary{\idxcode{basic_syncbuf}}%
+\indexlibrary{\idxcode{basic_osyncstream}}%
+\indexlibrary{\idxcode{ios}}%
+\indexlibrary{\idxcode{streambuf}}%
+\indexlibrary{\idxcode{istream}}%
+\indexlibrary{\idxcode{ostream}}%
+\indexlibrary{\idxcode{stringbuf}}%
+\indexlibrary{\idxcode{istringstream}}%
+\indexlibrary{\idxcode{ostringstream}}%
+\indexlibrary{\idxcode{stringstream}}%
+\indexlibrary{\idxcode{filebuf}}%
+\indexlibrary{\idxcode{ifstream}}%
+\indexlibrary{\idxcode{ofstream}}%
+\indexlibrary{\idxcode{fstream}}%
+\indexlibrary{\idxcode{wstreambuf}}%
+\indexlibrary{\idxcode{wistream}}%
+\indexlibrary{\idxcode{wostream}}%
+\indexlibrary{\idxcode{wstringbuf}}%
+\indexlibrary{\idxcode{wistringstream}}%
+\indexlibrary{\idxcode{wostringstream}}%
+\indexlibrary{\idxcode{wstringstream}}%
+\indexlibrary{\idxcode{wfilebuf}}%
+\indexlibrary{\idxcode{wifstream}}%
+\indexlibrary{\idxcode{wofstream}}%
+\indexlibrary{\idxcode{wfstream}}%
+\indexlibrary{\idxcode{syncbuf}}%
+\indexlibrary{\idxcode{wsyncbuf}}%
+\indexlibrary{\idxcode{osyncstream}}%
+\indexlibrary{\idxcode{wosyncstream}}%
+\begin{codeblock}
+namespace std {
+  template<class charT> class char_traits;
+  template<> class char_traits<char>;
+  template<> class char_traits<char16_t>;
+  template<> class char_traits<char32_t>;
+  template<> class char_traits<wchar_t>;
+
+  template<class T> class allocator;
+
+  template<class charT, class traits = char_traits<charT>>
+    class basic_ios;
+  template<class charT, class traits = char_traits<charT>>
+    class basic_streambuf;
+  template<class charT, class traits = char_traits<charT>>
+    class basic_istream;
+  template<class charT, class traits = char_traits<charT>>
+    class basic_ostream;
+  template<class charT, class traits = char_traits<charT>>
+    class basic_iostream;
+
+  template<class charT, class traits = char_traits<charT>,
+           class Allocator = allocator<charT>>
+    class basic_stringbuf;
+  template<class charT, class traits = char_traits<charT>,
+           class Allocator = allocator<charT>>
+    class basic_istringstream;
+  template<class charT, class traits = char_traits<charT>,
+           class Allocator = allocator<charT>>
+    class basic_ostringstream;
+  template<class charT, class traits = char_traits<charT>,
+           class Allocator = allocator<charT>>
+    class basic_stringstream;
+
+  template<class charT, class traits = char_traits<charT>>
+    class basic_filebuf;
+  template<class charT, class traits = char_traits<charT>>
+    class basic_ifstream;
+  template<class charT, class traits = char_traits<charT>>
+    class basic_ofstream;
+  template<class charT, class traits = char_traits<charT>>
+    class basic_fstream;
+
+  template<class charT, class traits = char_traits<charT>,
+           class Allocator = allocator<charT>>
+    class basic_syncbuf;
+  template<class charT, class traits = char_traits<charT>,
+           class Allocator = allocator<charT>>
+    class basic_osyncstream;
+
+  template<class charT, class traits = char_traits<charT>>
+    class istreambuf_iterator;
+  template<class charT, class traits = char_traits<charT>>
+    class ostreambuf_iterator;
+
+  using ios  = basic_ios<char>;
+  using wios = basic_ios<wchar_t>;
+
+  using streambuf = basic_streambuf<char>;
+  using istream   = basic_istream<char>;
+  using ostream   = basic_ostream<char>;
+  using iostream  = basic_iostream<char>;
+
+  using stringbuf     = basic_stringbuf<char>;
+  using istringstream = basic_istringstream<char>;
+  using ostringstream = basic_ostringstream<char>;
+  using stringstream  = basic_stringstream<char>;
+
+  using filebuf  = basic_filebuf<char>;
+  using ifstream = basic_ifstream<char>;
+  using ofstream = basic_ofstream<char>;
+  using fstream  = basic_fstream<char>;
+
+  using syncbuf = basic_syncbuf<char>;
+  using osyncstream = basic_osyncstream<char>;
+
+  using wstreambuf = basic_streambuf<wchar_t>;
+  using wistream   = basic_istream<wchar_t>;
+  using wostream   = basic_ostream<wchar_t>;
+  using wiostream  = basic_iostream<wchar_t>;
+
+  using wstringbuf     = basic_stringbuf<wchar_t>;
+  using wistringstream = basic_istringstream<wchar_t>;
+  using wostringstream = basic_ostringstream<wchar_t>;
+  using wstringstream  = basic_stringstream<wchar_t>;
+
+  using wfilebuf  = basic_filebuf<wchar_t>;
+  using wifstream = basic_ifstream<wchar_t>;
+  using wofstream = basic_ofstream<wchar_t>;
+  using wfstream  = basic_fstream<wchar_t>;
+
+  using wsyncbuf = basic_syncbuf<wchar_t>;
+  using wosyncstream = basic_osyncstream<wchar_t>;
+
+  template<class state> class fpos;
+  using streampos  = fpos<char_traits<char>::state_type>;
+  using wstreampos = fpos<char_traits<wchar_t>::state_type>;
+  @\added{using u16streampos = fpos<char_traits<char16_t>::state_type>;}@
+  @\added{using u32streampos = fpos<char_traits<char32_t>::state_type>;}@
+}
+\end{codeblock}
+
+\pnum
+Default template arguments are described as appearing both in
+\tcode{<iosfwd>}
+and in the synopsis of other headers
+but it is well-formed to include both
+\tcode{<iosfwd>}
+and one or more of the other headers.\footnote{It is the implementation's
+responsibility to implement headers so
+that including
+\tcode{<iosfwd>}
+and other headers does not violate the rules about
+multiple occurrences of default arguments.}
+
+\rSec2[iostream.forward.overview]{Overview}
+
+\pnum
+The
+class template specialization
+\tcode{basic_ios<charT, traits>}
+serves as a virtual base class for the
+class templates
+\tcode{basic_istream},
+\tcode{basic_ostream},
+and
+class templates
+derived from them.
+\tcode{basic_iostream}
+is a class
+template
+derived from both
+\tcode{basic_istream<charT, traits>}
+and
+\tcode{basic_ostream<charT, traits>}.
+
+\pnum
+The
+class template specialization
+\tcode{basic_streambuf<charT, traits>}
+serves as a base class for class templates
+\tcode{basic_stringbuf}%
+\changed{ and}{,}
+\tcode{basic_filebuf}%
+\added{, and
+\tcode{basic_syncbuf}}.
+
+\pnum
+The
+class template specialization
+\tcode{basic_istream<charT, traits>}
+serves as a base class for class templates
+\tcode{basic_istringstream}
+and
+\tcode{basic_ifstream}.
+
+\pnum
+The
+class template specialization
+\tcode{basic_ostream<charT, traits>}
+serves as a base class for class templates
+\tcode{basic_ostringstream}%
+\changed{ and}{,}
+\tcode{basic_ofstream}%
+\added{, and
+\tcode{basic_osyncstream}}.
+
+\pnum
+The
+class template specialization
+\tcode{basic_iostream<charT, traits>}
+serves as a base class for class templates
+\tcode{basic_stringstream}
+and
+\tcode{basic_fstream}.
+
+\begin{addedblock}
+\pnum
+\begin{note}
+For each of the class templates above,
+the program is ill-formed
+if \tcode{traits::char_type} is not the same type as
+\tcode{charT}\iref{char.traits}.
+\end{note}
+\end{addedblock}
+
+\pnum
+Other \grammarterm{typedef-name}{s} define instances of
+class templates
+specialized for
+\tcode{char}
+or
+\tcode{wchar_t}
+types.
+
+\pnum
+Specializations of the class template
+\tcode{fpos}
+are
+used for specifying file position information.
+
+\pnum
+The types
+\tcode{streampos}
+and
+\tcode{wstreampos}
+are used for positioning streams specialized on
+\tcode{char}
+and
+\tcode{wchar_t}
+respectively.
+
+\pnum
+\begin{note}
+This synopsis suggests a circularity between
+\tcode{streampos}
+and
+\tcode{char_traits<char>}.
+An implementation can avoid this circularity by substituting equivalent
+types.
+\begin{removedblock}
+One way to do this might be
+\begin{codeblock}
+template<class stateT> class fpos { @\commentellip@ };      // depends on nothing
+using _STATE = @\commentellip@ ;             // implementation private declaration of \tcode{stateT}
+
+using streampos = fpos<_STATE>;
+
+template<> struct char_traits<char> {
+  using pos_type = streampos;
+}
+\end{codeblock}
+\end{removedblock}
+\end{note}
+
+\draftnote{Given that we defined \tcode{char_traits<char>::state_type} to be exactly \tcode{mbstate_t},
+the example seems pointless. }
